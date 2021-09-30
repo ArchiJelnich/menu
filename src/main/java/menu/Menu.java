@@ -1,17 +1,36 @@
 package menu;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.*;
 
 public class Menu {
   public static void main(String[] args) {
+
+    Properties props = new Properties();
+    String key = "null";
+    try (InputStream in = new FileInputStream("src/main/resources/config.properties")) {
+      props.load(in);
+      in.close();
+      key = (String) props.get("Key");
+       }
+    catch (Exception e)
+    {
+      System.out.println("Can't find key");
+
+    }
+
+
     System.out.println("Welcome to menu");
+
+
     String town = "Syrgyt";
     String date = "today";
 
 
 
     boolean ExitValue=false;
-    int in = 0;
+    int cont_menu = 0;
     while (!ExitValue) {
 
       System.out.println("1 - change town, 2 - choose date, 3 - run, 4 - exit");
@@ -19,12 +38,12 @@ public class Menu {
 
       Scanner in_c = new Scanner(System.in);
 
-      try {in = in_c.nextInt();}
+      try {cont_menu = in_c.nextInt();}
       catch(InputMismatchException exception) {
-        in = 0;
+        cont_menu = 0;
       }
 
-      switch (in) {
+      switch (cont_menu) {
         case 1:
           town=Action.Town();
           break;
@@ -35,7 +54,7 @@ public class Menu {
           date=Action.Date();
           break;
         case 3:
-          System.out.println(Action.Run(town, date));
+          System.out.println(Action.Run(town, date, key));
           break;
         default:
           System.out.println("Try again!");
@@ -92,8 +111,8 @@ public class Menu {
       return date;
     }
 
-    public static String Run(String town, String date) {
-      String run = "Result of running= " + town + " + " + date;
+    public static String Run(String town, String date, String key) {
+      String run = "Result of running= " + town + " + " + date + " key=" + key;
       return run;
     }
 
