@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.util.*;
 
 public class Menu {
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
 
     Properties props = new Properties();
     String key = "null";
@@ -54,7 +54,7 @@ public class Menu {
           date=Action.Date();
           break;
         case 3:
-          System.out.println(Action.Run(town, date, key));
+          System.out.println(Action.Run(key));
           break;
         default:
           System.out.println("Try again!");
@@ -111,9 +111,10 @@ public class Menu {
       return date;
     }
 
-    public static String Run(String town, String date, String key) {
-      String run = "Result of running= " + town + " + " + date + " key=" + key;
-      return run;
+    public static String Run(String key) throws Exception {
+
+       return new HttpClient().sendGet(key);
+
     }
 
 
