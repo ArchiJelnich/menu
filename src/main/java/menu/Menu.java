@@ -8,7 +8,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Menu {
+
+  private static String town;
+  public static String date;
+  public static int int_date;
+
   public static void main(String[] args) throws Exception {
+
+    town = "Syrgyt";
+    date = "today";
+    int_date = 0;
 
     Properties props = new Properties();
     String key = "null";
@@ -27,8 +36,7 @@ public class Menu {
     System.out.println("Welcome to menu");
 
 
-    String town = "Syrgyt";
-    String date = "today";
+
 
 
 
@@ -54,7 +62,8 @@ public class Menu {
           ExitValue=true;
           break;
         case 2:
-          date=Action.Date();
+          // date=Action.Date();
+          Action.Date();
           break;
         case 3:
           Action.Run(key);
@@ -80,58 +89,63 @@ public class Menu {
       if (!Menu.Action.isAlpha(town)) {System.out.println("Wrong input");
         town = "Syrgyt"; }
 
-      // Добавить проверку на пустую строчку
-      // Убрать перезатирание при непарвильном ввводе
+
 
       return town;
     }
 
-    public static String Date() {
+    public static void Date() {
 
-      System.out.println("1 - today, 2 - tomorrow, 3 - day after tomorrow");
+      System.out.println("0 - today, 1 - tomorrow, 2 - day after tomorrow");
       Scanner in_c = new Scanner(System.in);
-      String date;
+      // String date;
       int in;
       try {in = in_c.nextInt();}
       catch(InputMismatchException exception) {
         in = 0;
       }
       switch (in) {
-        case 1:
+        case 0:
           date = "today";
+          int_date =  in;
+          break;
+        case 1:
+          date = "tomorrow";
+          int_date =  in;
           break;
         case 2:
-          date = "tomorrow";
-          break;
-        case 3:
           date = "day after tomorrow";
+          int_date =  in;
           break;
         default:
           System.out.println("Error. Date set to today");
           date = "today";
+          int_date =  0;
           break;}
 
-      return date;
+      //return date;
     }
 
     public static void Run(String key) throws Exception {
 
        String JSON =  new HttpClient().sendGet(key);
        // System.out.println(JSON);
+       // System.out.println(int_date);
 
        JSONObject json = new JSONObject(JSON);
-       JSONObject fact = json.getJSONObject("fact");
-       int feels_like = fact.getInt("feels_like");
-       System.out.println("feels_like =" + feels_like);
 
-       int temp = fact.getInt("temp");
-       System.out.println("temp =" + temp);
+      JSONArray forecasts = json.getJSONArray("forecasts");
+      JSONObject f_0 = forecasts.getJSONObject(int_date);
+      JSONObject parts = f_0.getJSONObject("parts");
+      JSONObject day = parts.getJSONObject("day");
+      double temp_avg = day.getDouble("temp_avg");
+      System.out.println("temp_avg =" + temp_avg);
 
-       String condition = fact.getString("condition");
-       System.out.println("condition =" + condition);
+      double wind_speed = day.getDouble("wind_speed");
+      System.out.println("wind speed =" + wind_speed);
 
-       double wind_speed = fact.getDouble("wind_speed");
-       System.out.println("wind_speed =" + wind_speed);
+      String condition = day.getString("condition");
+      System.out.println("condition =" + condition);
 
     }
 

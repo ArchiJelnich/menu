@@ -21,7 +21,7 @@ public class HttpClient {
 
         String httpresponse;
         Request request = new Request.Builder()
-                .url("https://api.weather.yandex.ru/v2/forecast?lat=55.75396&lon=37.620393")
+                .url("https://api.weather.yandex.ru/v2/forecast?lat=55.75396&lon=37.620393&limit=3&hours=false")
                 .addHeader("X-Yandex-API-Key", key)  // add request headers
                 .build();
 
