@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.*;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Menu {
@@ -12,12 +11,18 @@ public class Menu {
   private static String town;
   public static String date;
   public static int int_date;
+  public static double lat;
+  public static double lng;
+
 
   public static void main(String[] args) throws Exception {
 
     town = "Syrgyt";
+    lat = 39.78373;
+    lng = -100.445882;
     date = "today";
     int_date = 0;
+
 
     Properties props = new Properties();
     String key = "null";
@@ -32,6 +37,17 @@ public class Menu {
 
     }
 
+    String key_town = "null";
+    try (InputStream in = new FileInputStream("src/main/resources/config.properties")) {
+      props.load(in);
+      in.close();
+      key_town = (String) props.get("Key_town");
+    }
+    catch (Exception e)
+    {
+      System.out.println("Can't find key");
+
+    }
 
     System.out.println("Welcome to menu");
 
@@ -41,7 +57,7 @@ public class Menu {
 
 
     boolean ExitValue=false;
-    int cont_menu = 0;
+    int cont_menu;
     while (!ExitValue) {
 
       System.out.println("1 - change town, 2 - choose date, 3 - run, 4 - exit");
@@ -56,7 +72,7 @@ public class Menu {
 
       switch (cont_menu) {
         case 1:
-          town=Action.Town();
+          Action.Town(key_town);
           break;
         case 4:
           ExitValue=true;
@@ -82,16 +98,33 @@ public class Menu {
 
 
   static class Action {
-    public static String Town() {
+    public static void Town(String key_town) throws Exception {
       Scanner in_c = new Scanner(System.in);
       System.out.println("Enter town");
-      String town = in_c.nextLine();
-      if (!Menu.Action.isAlpha(town)) {System.out.println("Wrong input");
-        town = "Syrgyt"; }
+      town = in_c.nextLine();
+      String JSON_Town =  new HttpClient().sendGetTown(key_town, town);
+      // System.out.println(JSON_Town);
+
+
+      JSONObject json = new JSONObject(JSON_Town);
+
+      JSONArray results = json.getJSONArray("results");
+      JSONObject f_0 = results.getJSONObject(0);
+      JSONArray locations = f_0.getJSONArray("locations");
+      JSONObject locations_0 = locations.getJSONObject(0);
+
+      town = locations_0.getString("adminArea5");
+      String country = locations_0.getString("adminArea1");
+
+      JSONObject latLng = locations_0.getJSONObject("latLng");
+      lat = latLng.getDouble("lat");
+      lng = latLng.getDouble("lng");
+
+      System.out.println("Selected city=" + town + " " + country);
 
 
 
-      return town;
+
     }
 
     public static void Date() {
@@ -128,11 +161,11 @@ public class Menu {
 
     public static void Run(String key) throws Exception {
 
-       String JSON =  new HttpClient().sendGet(key);
+      String JSON =  new HttpClient().sendGet(key, lat, lng);
        // System.out.println(JSON);
        // System.out.println(int_date);
 
-       JSONObject json = new JSONObject(JSON);
+      JSONObject json = new JSONObject(JSON);
 
       JSONArray forecasts = json.getJSONArray("forecasts");
       JSONObject f_0 = forecasts.getJSONObject(int_date);
