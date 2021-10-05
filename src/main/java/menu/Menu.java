@@ -3,6 +3,9 @@ package menu;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Menu {
   public static void main(String[] args) throws Exception {
@@ -54,7 +57,7 @@ public class Menu {
           date=Action.Date();
           break;
         case 3:
-          System.out.println(Action.Run(key));
+          Action.Run(key);
           break;
         default:
           System.out.println("Try again!");
@@ -111,9 +114,24 @@ public class Menu {
       return date;
     }
 
-    public static String Run(String key) throws Exception {
+    public static void Run(String key) throws Exception {
 
-       return new HttpClient().sendGet(key);
+       String JSON =  new HttpClient().sendGet(key);
+       // System.out.println(JSON);
+
+       JSONObject json = new JSONObject(JSON);
+       JSONObject fact = json.getJSONObject("fact");
+       int feels_like = fact.getInt("feels_like");
+       System.out.println("feels_like =" + feels_like);
+
+       int temp = fact.getInt("temp");
+       System.out.println("temp =" + temp);
+
+       String condition = fact.getString("condition");
+       System.out.println("condition =" + condition);
+
+       double wind_speed = fact.getDouble("wind_speed");
+       System.out.println("wind_speed =" + wind_speed);
 
     }
 
